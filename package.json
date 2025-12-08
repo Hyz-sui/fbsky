@@ -10,5 +10,8 @@
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
     "start": "wrangler dev"
+  },
+  "dependencies": {
+    "@atproto/api": "^0.18.4"
   }
 }
