@@ -1,15 +1,22 @@
 import { ClientEnvironment } from "../client-environment";
 import { PostSummary } from "../services/bluesky-service";
-import { escapeHtml } from "../utils/string-util";
+import { escapeHtml, escapeJavaScript } from "../utils/string-util";
 
 export const generatePostRedirectPage = (post: PostSummary, clientEnvironment: ClientEnvironment): string => {
     const safeAccountName = post.accountName ? escapeHtml(post.accountName) : undefined;
     const safeHandle = escapeHtml(post.handle);
     const safeText = post.text ? escapeHtml(post.text) : undefined;
-    const safeAuthorDid = escapeHtml(post.authorDid);
-    const safeRkey = escapeHtml(post.rkey);
+
+    const dangerousEncodedAuthorDid = encodeURIComponent(post.authorDid).replace(/%3[aA]/g, ':');
+    const safeEncodedAuthorDid = escapeHtml(dangerousEncodedAuthorDid);
+    const jsEncodedAuthorDid = escapeJavaScript(dangerousEncodedAuthorDid);
+
+    const dangerousEncodedRkey = encodeURIComponent(post.rkey);
+    const safeEncodedRkey = escapeHtml(dangerousEncodedRkey);
+    const jsEncodedRkey = escapeJavaScript(dangerousEncodedRkey);
+
     const dangerousWellFormedText = post.text ? post.text.replace(/\n+/g, ' ') : undefined;
-    const safeWellFormedText = (dangerousWellFormedText ? escapeHtml(dangerousWellFormedText) : undefined) || undefined;
+    const safeWellFormedText = dangerousWellFormedText ? escapeHtml(dangerousWellFormedText) : undefined;
 
     const safePageTitle = `${safeAccountName
         ? `${safeAccountName} (@${safeHandle})`
@@ -21,6 +28,12 @@ export const generatePostRedirectPage = (post: PostSummary, clientEnvironment: C
                 : '\'s post'
         }`;
 
+    const jsRedirectScript = `
+setTimeout(() => {
+    window.location.replace("https://bsky.app/profile/${jsEncodedAuthorDid}/post/${jsEncodedRkey}");
+}, 1000);
+        `;
+
     return `
 <!DOCTYPE html>
 <html>
@@ -29,9 +42,13 @@ export const generatePostRedirectPage = (post: PostSummary, clientEnvironment: C
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${safePageTitle}</title>
     <meta property="og:title" content="${safePageTitle}">
-    <meta property="og:description" content="${safeText}">
+    <meta property="og:description" content="${safeText
+        || (clientEnvironment.language === 'ja'
+            ? '投稿を見る'
+            : 'View post')
+        }">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://bsky.app/profile/${safeAuthorDid}/post/${safeRkey}">
+    <meta property="og:url" content="https://bsky.app/profile/${safeEncodedAuthorDid}/post/${safeEncodedRkey}">
 </head>
 <body>
     <h1>${clientEnvironment.language === 'ja'
@@ -43,13 +60,11 @@ export const generatePostRedirectPage = (post: PostSummary, clientEnvironment: C
             : 'Please wait a moment...'
         }</p>
     <p>${clientEnvironment.language === 'ja'
-            ? `自動で移動しない場合: <a href="https://bsky.app/profile/${safeAuthorDid}/post/${safeRkey}">手動で移動する</a>`
-            : `If you are not redirected automatically: <a href="https://bsky.app/profile/${safeAuthorDid}/post/${safeRkey}">JUMP TO BLUESKY MANUALLY</a>`
+        ? `自動で移動しない場合: <a href="https://bsky.app/profile/${safeEncodedAuthorDid}/post/${safeEncodedRkey}">手動で移動する</a>`
+        : `If you are not redirected automatically: <a href="https://bsky.app/profile/${safeEncodedAuthorDid}/post/${safeEncodedRkey}">JUMP TO BLUESKY MANUALLY</a>`
         }</p>
     <script>
-        setTimeout(() => {
-            window.location.replace("https://bsky.app/profile/${safeAuthorDid}/post/${safeRkey}");
-        }, 1000);
+        ${jsRedirectScript}
     </script>
 </body>
 </html>
