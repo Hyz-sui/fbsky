@@ -102,7 +102,6 @@ export const work = async (
     clientEnvironment: ClientEnvironment,
 ) => {
     const url = new URL(requestUrl);
-    console.log(url.pathname);
     if (url.pathname === '/') {
         return respondWithTopPage(clientEnvironment);
     }
