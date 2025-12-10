@@ -10,7 +10,6 @@ import { generatePostRedirectPage } from "./redirect-pages/post";
 type FetchErrorKind = 'InvalidUrl' | 'NotFound' | 'ApiFailure';
 
 const respondWithPostSummary = (postSummary: PostSummary, clientEnvironment: ClientEnvironment): ResponseSummary => {
-    // 仮
     return {
         content: generatePostRedirectPage(postSummary, clientEnvironment),
         mimeType: 'text/html',
