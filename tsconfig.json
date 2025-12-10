@@ -5,6 +5,7 @@
     "moduleResolution": "bundler",
     "types": [],
     "strict": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "lib": ["esnext"]
   },
