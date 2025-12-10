@@ -1,6 +1,9 @@
 import { ClientEnvironment } from "../client-environment";
-import postNotFoundHtml from '../static/ja/error/post-not-found.html';
-import apiFailureHtml from '../static/ja/error/api-failure.html';
+
+import jaPostNotFoundHtml from '../static/ja/error/post-not-found.html';
+import enPostNotFoundHtml from '../static/en/error/post-not-found.html';
+import jaApiFailureHtml from '../static/ja/error/api-failure.html';
+import enApiFailureHtml from '../static/en/error/api-failure.html';
 import ja404Html from '../static/ja/error/404.html';
 import en404Html from '../static/en/error/404.html';
 
@@ -21,13 +24,13 @@ export const errorResponseService = {
     },
     getPostNotFoundPage: (clientEnvironment: ClientEnvironment): ResponseContentSummary => {
         return {
-            content: postNotFoundHtml,
+            content: clientEnvironment.language === 'ja' ? jaPostNotFoundHtml : enPostNotFoundHtml,
             mimeType: 'text/html',
         };
     },
     getApiFailurePage: (clientEnvironment: ClientEnvironment): ResponseContentSummary => {
         return {
-            content: apiFailureHtml,
+            content: clientEnvironment.language === 'ja' ? jaApiFailureHtml : enApiFailureHtml,
             mimeType: 'text/html',
         };
     },
