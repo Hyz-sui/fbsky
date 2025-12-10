@@ -13,6 +13,7 @@ export type PostSummary = {
     text: string | undefined;
     authorDid: string;
     rkey: string;
+    avatarUrl: string | undefined;
 };
 export const isPostSummary = (value: any): value is PostSummary => {
     return value && typeof value === 'object' &&
@@ -20,7 +21,8 @@ export const isPostSummary = (value: any): value is PostSummary => {
         'handle' in value && typeof value.handle === 'string' &&
         'text' in value &&
         'authorDid' in value && typeof value.authorDid === 'string' &&
-        'rkey' in value && typeof value.rkey === 'string';
+        'rkey' in value && typeof value.rkey === 'string' &&
+        'avatarUrl' in value;
 }
 
 export const blueskyService = {
@@ -52,6 +54,7 @@ export const blueskyService = {
                 text,
                 authorDid: post.author.did,
                 rkey: post.uri.split('/').pop()!,
+                avatarUrl: post.author.avatar,
             };
         } catch (error) {
             if (error instanceof NotFoundError) {

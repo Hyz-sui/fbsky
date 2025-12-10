@@ -15,6 +15,8 @@ export const generatePostRedirectPage = (post: PostSummary, clientEnvironment: C
     const safeEncodedRkey = escapeHtml(dangerousEncodedRkey);
     const jsEncodedRkey = escapeJavaScript(dangerousEncodedRkey);
 
+    const safeAvatarUrl = post.avatarUrl ? escapeHtml(post.avatarUrl) : undefined;
+
     const dangerousWellFormedText = post.text ? post.text.replace(/\n+/g, ' ') : undefined;
     const safeWellFormedText = dangerousWellFormedText ? escapeHtml(dangerousWellFormedText) : undefined;
 
@@ -49,6 +51,7 @@ setTimeout(() => {
         }">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://bsky.app/profile/${safeEncodedAuthorDid}/post/${safeEncodedRkey}">
+    ${safeAvatarUrl ? `<meta property="og:image" content="${safeAvatarUrl}">` : ''}
 </head>
 <body>
     <h1>${clientEnvironment.language === 'ja'
@@ -60,8 +63,8 @@ setTimeout(() => {
             : 'Please wait a moment...'
         }</p>
     <p>${clientEnvironment.language === 'ja'
-        ? `自動で移動しない場合: <a href="https://bsky.app/profile/${safeEncodedAuthorDid}/post/${safeEncodedRkey}">手動で移動する</a>`
-        : `If you are not redirected automatically: <a href="https://bsky.app/profile/${safeEncodedAuthorDid}/post/${safeEncodedRkey}">JUMP TO BLUESKY MANUALLY</a>`
+            ? `自動で移動しない場合: <a href="https://bsky.app/profile/${safeEncodedAuthorDid}/post/${safeEncodedRkey}">手動で移動する</a>`
+            : `If you are not redirected automatically: <a href="https://bsky.app/profile/${safeEncodedAuthorDid}/post/${safeEncodedRkey}">JUMP TO BLUESKY MANUALLY</a>`
         }</p>
     <script>
         ${jsRedirectScript}
