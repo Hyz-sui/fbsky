@@ -8,13 +8,17 @@ export const generatePostRedirectPage = (post: PostSummary, clientEnvironment: C
     const safeText = post.text ? escapeHtml(post.text) : undefined;
     const safeAuthorDid = escapeHtml(post.authorDid);
     const safeRkey = escapeHtml(post.rkey);
+    const dangerousWellFormedText = post.text ? post.text.replace(/\n+/g, ' ') : undefined;
+    const safeWellFormedText = (dangerousWellFormedText ? escapeHtml(dangerousWellFormedText) : undefined) || undefined;
 
     const safePageTitle = `${safeAccountName
         ? `${safeAccountName} (@${safeHandle})`
         : safeHandle
-        } ${clientEnvironment.language === 'ja'
-            ? 'さんの投稿'
-            : '\'s post'
+        }${safeWellFormedText
+            ? `: ${safeWellFormedText}`
+            : clientEnvironment.language === 'ja'
+                ? 'さんの投稿'
+                : '\'s post'
         }`;
 
     return `
