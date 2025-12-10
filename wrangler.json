@@ -1,0 +1,21 @@
+{
+    "$schema": "./node_modules/wrangler/config-schema.json",
+    "name": "fbsky",
+    "main": "src/index.ts",
+    "compatibility_date": "2025-12-09",
+    "compatibility_flags": [
+        "nodejs_compat"
+    ],
+    "observability": {
+        "enabled": true
+    },
+    "rules": [
+        {
+            "type": "Text",
+            "globs": [
+                "src/static/**/*.html"
+            ],
+            "fallthrough": true
+        }
+    ]
+}
