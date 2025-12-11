@@ -1,17 +1,26 @@
 import { ClientEnvironment } from "./client-environment";
 import { ResponseSummary } from "./response-summary";
-import { BlueskyService, isPostSummary, PostSummary } from "./services/bluesky-service";
+import { BlueskyService, isPostSummary, isProfileSummary, PostSummary, ProfileSummary } from "./services/bluesky-service";
 import { ErrorResponseService } from "./services/error-response-service";
 
 import jaIndexHtml from './static/ja/index.html';
 import enIndexHtml from './static/en/index.html';
 import { generatePostRedirectPage } from "./redirect-pages/post";
+import { generateProfileRedirectPage } from "./redirect-pages/profile";
 
 type FetchErrorKind = 'InvalidUrl' | 'NotFound' | 'ApiFailure';
 
 const respondWithPostSummary = (postSummary: PostSummary, clientEnvironment: ClientEnvironment): ResponseSummary => {
     return {
         content: generatePostRedirectPage(postSummary, clientEnvironment),
+        mimeType: 'text/html',
+        status: 200,
+    };
+}
+
+const respondWithProfileSummary = (profileSummary: ProfileSummary, clientEnvironment: ClientEnvironment): ResponseSummary => {
+    return {
+        content: generateProfileRedirectPage(profileSummary, clientEnvironment),
         mimeType: 'text/html',
         status: 200,
     };
@@ -62,6 +71,7 @@ const respondWithError = (
 }
 
 const postUrlRegex = /^\/profile\/(?<identifier>[^/]+)\/post\/(?<rkey>[^/]+)$/;
+const profileUrlRegex = /^\/profile\/(?<identifier>[^/]+)$/;
 
 // https://bsky.app/profile/hyzsui.com/post/3m7ieabkso22k
 // https://fbsky.domain.example/profile/hyzsui.com/post/3m7ieabkso22k
@@ -76,12 +86,12 @@ const extractPostUri = (requestUrl: URL) => {
     return undefined;
 }
 
-const fetchPostSummary = async (blueskyService: BlueskyService, requestUrl: URL): Promise<FetchErrorKind | PostSummary> => {
-    const postUri = extractPostUri(requestUrl);
-    if (!postUri) {
-        return 'InvalidUrl';
-    }
+const fetchPostSummary = async (
+    blueskyService: BlueskyService,
+    query: { identifier: string, rkey: string },
+): Promise<FetchErrorKind | PostSummary> => {
     try {
+        const postUri = `at://${query.identifier}/app.bsky.feed.post/${query.rkey}`;
         const postSummary = await blueskyService.getPost(postUri);
         if (postSummary === 'NotFound') {
             return 'NotFound';
@@ -90,6 +100,24 @@ const fetchPostSummary = async (blueskyService: BlueskyService, requestUrl: URL)
             return 'ApiFailure';
         }
         return postSummary;
+    } catch (error) {
+        return 'ApiFailure';
+    }
+}
+
+const fetchProfileSummary = async (
+    blueskyService: BlueskyService,
+    query: { identifier: string },
+): Promise<FetchErrorKind | ProfileSummary> => {
+    try {
+        const profileSummary = await blueskyService.getProfile(query.identifier);
+        if (profileSummary === 'NotFound') {
+            return 'NotFound';
+        }
+        if (profileSummary === 'RespondedWithFailure') {
+            return 'ApiFailure';
+        }
+        return profileSummary;
     } catch (error) {
         return 'ApiFailure';
     }
@@ -105,10 +133,25 @@ export const work = async (
     if (url.pathname === '/') {
         return respondWithTopPage(clientEnvironment);
     }
-    const postSummary = await fetchPostSummary(blueskyService, url);
-    const isErroring = !isPostSummary(postSummary);
-    if (isErroring) {
-        return respondWithError(errorResponseService, postSummary, clientEnvironment);
+    const postMatch = url.pathname.match(postUrlRegex);
+    if (postMatch) {
+        const { identifier, rkey } = postMatch.groups!;
+        const postSummary = await fetchPostSummary(blueskyService, { identifier, rkey });
+        const isErroring = !isPostSummary(postSummary);
+        if (isErroring) {
+            return respondWithError(errorResponseService, postSummary, clientEnvironment);
+        }
+        return respondWithPostSummary(postSummary, clientEnvironment);
     }
-    return respondWithPostSummary(postSummary, clientEnvironment);
+    const profileMatch = url.pathname.match(profileUrlRegex);
+    if (profileMatch) {
+        const { identifier } = profileMatch.groups!;
+        const profileSummary = await fetchProfileSummary(blueskyService, { identifier });
+        const isErroring = !isProfileSummary(profileSummary);
+        if (isErroring) {
+            return respondWithError(errorResponseService, profileSummary, clientEnvironment);
+        }
+        return respondWithProfileSummary(profileSummary, clientEnvironment);
+    }
+    return respondWithTopPage(clientEnvironment);
 }
