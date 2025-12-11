@@ -76,12 +76,12 @@ const extractPostUri = (requestUrl: URL) => {
     return undefined;
 }
 
-const fetchPostSummary = async (blueskyService: BlueskyService, requestUrl: URL): Promise<FetchErrorKind | PostSummary> => {
-    const postUri = extractPostUri(requestUrl);
-    if (!postUri) {
-        return 'InvalidUrl';
-    }
+const fetchPostSummary = async (
+    blueskyService: BlueskyService,
+    query: { identifier: string, rkey: string },
+): Promise<FetchErrorKind | PostSummary> => {
     try {
+        const postUri = `at://${query.identifier}/app.bsky.feed.post/${query.rkey}`;
         const postSummary = await blueskyService.getPost(postUri);
         if (postSummary === 'NotFound') {
             return 'NotFound';
@@ -105,10 +105,15 @@ export const work = async (
     if (url.pathname === '/') {
         return respondWithTopPage(clientEnvironment);
     }
-    const postSummary = await fetchPostSummary(blueskyService, url);
-    const isErroring = !isPostSummary(postSummary);
-    if (isErroring) {
-        return respondWithError(errorResponseService, postSummary, clientEnvironment);
+    const postMatch = url.pathname.match(postUrlRegex);
+    if (postMatch) {
+        const { identifier, rkey } = postMatch.groups!;
+        const postSummary = await fetchPostSummary(blueskyService, { identifier, rkey });
+        const isErroring = !isPostSummary(postSummary);
+        if (isErroring) {
+            return respondWithError(errorResponseService, postSummary, clientEnvironment);
+        }
+        return respondWithPostSummary(postSummary, clientEnvironment);
     }
-    return respondWithPostSummary(postSummary, clientEnvironment);
+    return respondWithTopPage(clientEnvironment);
 }
