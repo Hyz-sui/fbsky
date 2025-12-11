@@ -1,17 +1,26 @@
 import { ClientEnvironment } from "./client-environment";
 import { ResponseSummary } from "./response-summary";
-import { BlueskyService, isPostSummary, PostSummary } from "./services/bluesky-service";
+import { BlueskyService, isPostSummary, isProfileSummary, PostSummary, ProfileSummary } from "./services/bluesky-service";
 import { ErrorResponseService } from "./services/error-response-service";
 
 import jaIndexHtml from './static/ja/index.html';
 import enIndexHtml from './static/en/index.html';
 import { generatePostRedirectPage } from "./redirect-pages/post";
+import { generateProfileRedirectPage } from "./redirect-pages/profile";
 
 type FetchErrorKind = 'InvalidUrl' | 'NotFound' | 'ApiFailure';
 
 const respondWithPostSummary = (postSummary: PostSummary, clientEnvironment: ClientEnvironment): ResponseSummary => {
     return {
         content: generatePostRedirectPage(postSummary, clientEnvironment),
+        mimeType: 'text/html',
+        status: 200,
+    };
+}
+
+const respondWithProfileSummary = (profileSummary: ProfileSummary, clientEnvironment: ClientEnvironment): ResponseSummary => {
+    return {
+        content: generateProfileRedirectPage(profileSummary, clientEnvironment),
         mimeType: 'text/html',
         status: 200,
     };
@@ -62,6 +71,7 @@ const respondWithError = (
 }
 
 const postUrlRegex = /^\/profile\/(?<identifier>[^/]+)\/post\/(?<rkey>[^/]+)$/;
+const profileUrlRegex = /^\/profile\/(?<identifier>[^/]+)$/;
 
 // https://bsky.app/profile/hyzsui.com/post/3m7ieabkso22k
 // https://fbsky.domain.example/profile/hyzsui.com/post/3m7ieabkso22k
@@ -95,6 +105,24 @@ const fetchPostSummary = async (
     }
 }
 
+const fetchProfileSummary = async (
+    blueskyService: BlueskyService,
+    query: { identifier: string },
+): Promise<FetchErrorKind | ProfileSummary> => {
+    try {
+        const profileSummary = await blueskyService.getProfile(query.identifier);
+        if (profileSummary === 'NotFound') {
+            return 'NotFound';
+        }
+        if (profileSummary === 'RespondedWithFailure') {
+            return 'ApiFailure';
+        }
+        return profileSummary;
+    } catch (error) {
+        return 'ApiFailure';
+    }
+}
+
 export const work = async (
     blueskyService: BlueskyService,
     errorResponseService: ErrorResponseService,
@@ -114,6 +142,16 @@ export const work = async (
             return respondWithError(errorResponseService, postSummary, clientEnvironment);
         }
         return respondWithPostSummary(postSummary, clientEnvironment);
+    }
+    const profileMatch = url.pathname.match(profileUrlRegex);
+    if (profileMatch) {
+        const { identifier } = profileMatch.groups!;
+        const profileSummary = await fetchProfileSummary(blueskyService, { identifier });
+        const isErroring = !isProfileSummary(profileSummary);
+        if (isErroring) {
+            return respondWithError(errorResponseService, profileSummary, clientEnvironment);
+        }
+        return respondWithProfileSummary(profileSummary, clientEnvironment);
     }
     return respondWithTopPage(clientEnvironment);
 }

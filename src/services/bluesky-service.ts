@@ -25,6 +25,22 @@ export const isPostSummary = (value: any): value is PostSummary => {
         'avatarUrl' in value;
 }
 
+export type ProfileSummary = {
+    displayName: string | undefined;
+    did: string;
+    handle: string;
+    avatarUrl: string | undefined;
+    description: string | undefined;
+}
+export const isProfileSummary = (value: any): value is ProfileSummary => {
+    return value && typeof value === 'object' &&
+        'displayName' in value &&
+        'did' in value && typeof value.did === 'string' &&
+        'handle' in value && typeof value.handle === 'string' &&
+        'avatarUrl' in value &&
+        'description' in value;
+}
+
 export const blueskyService = {
     getPost: async (uri: string): Promise<PostSummary | ApiErrorKind> => {
         try {
@@ -61,6 +77,35 @@ export const blueskyService = {
                 return 'NotFound'
             }
             console.error('Error fetching post:', error);
+            return 'RespondedWithFailure'
+        }
+    },
+    getProfile: async (identifier: string): Promise<ProfileSummary | ApiErrorKind> => {
+        try {
+            const response = await agent.getProfile({
+                actor: identifier,
+            });
+
+            if (!response.success) {
+                return 'RespondedWithFailure'
+            }
+
+            const profile = response.data;
+            const displayName = profile.displayName;
+            const did = profile.did;
+            const handle = profile.handle;
+            const avatarUrl = profile.avatar;
+            const description = profile.description;
+
+            return {
+                displayName,
+                did,
+                handle,
+                avatarUrl,
+                description,
+            };
+        } catch (error) {
+            console.error('Error fetching profile:', error);
             return 'RespondedWithFailure'
         }
     },
