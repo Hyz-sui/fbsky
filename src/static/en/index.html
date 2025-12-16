@@ -1,11 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Top Page</title>
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/form.css" />
+    <script src="./js/url-converter.js" type="module" defer></script>
 </head>
+
 <body>
-    <h1>Top Page</h1>
+    <main>
+        <h1>Top Page</h1>
+        <section class="converter-section">
+            <h2 class="visually-hidden">Bluesky URL to Embedding URL Converter</h2>
+            <form onsubmit="return false;" class="card elevated form-card">
+                <label class="input-label">
+                    Bluesky URL
+                    <input type="url" name="url" id="url" class="input" />
+                </label>
+                <div id="fixedUrlArea" class="fixed-url-area" style="visibility: hidden;">
+                    <span id="fixedUrlLabel" class="fixed-url-label">Embedding URL</span>
+                    <div class="fixed-url-box card outlined" aria-labelledby="fixedUrlLabel">
+                        <a id="fixedUrl" class="fixed-url" target="_blank" rel="noopener noreferrer"></a>
+                    </div>
+                </div>
+                <button type="submit" id="copyFixedUrlButton" class="copy-fixed-url-button" aria-disabled="true">
+                    Copy Embedding URL
+                </button>
+            </form>
+        </section>
+    </main>
 </body>
+
 </html>
