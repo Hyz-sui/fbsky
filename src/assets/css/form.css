@@ -1,0 +1,23 @@
+.form-card {
+    display: flex;
+    flex-direction: column;
+    word-break: break-all;
+    width: 32rem;
+}
+
+@media (max-width: 768px) {
+    .form-card {
+        width: auto;
+        align-self: stretch;
+    }
+}
+
+.input-label {
+    display: flex;
+    flex-direction: column;
+}
+
+.fixed-url-area {
+    display: flex;
+    flex-direction: column;
+}
