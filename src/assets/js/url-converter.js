@@ -62,6 +62,9 @@ const updateFixedUrl = (urlInput, fixedUrlArea, fixedUrlElement, copyFixedUrlBut
  */
 const copyFixedUrl = (fixedUrlElement) => {
     const fixedUrl = fixedUrlElement.textContent;
+    if (fixedUrl) {
+        navigator.clipboard.writeText(fixedUrl);
+    }
     navigator.clipboard.writeText(fixedUrl);
 }
 
