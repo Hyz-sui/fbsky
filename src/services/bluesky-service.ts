@@ -1,4 +1,4 @@
-import { AtpAgent, AppBskyFeedDefs, AppBskyEmbedImages } from '@atproto/api';
+import { AtpAgent, AppBskyFeedDefs, AppBskyEmbedImages, AppBskyEmbedRecordWithMedia } from '@atproto/api';
 import { NotFoundError } from '@atproto/api/dist/client/types/app/bsky/feed/getPostThread';
 
 const agent: AtpAgent = new AtpAgent({
@@ -67,7 +67,11 @@ export const blueskyService = {
             const text = typeof record.text === 'string' ? record.text : undefined;
 
             const embed = post.embed;
-            const imageUrl = AppBskyEmbedImages.isView(embed) ? embed.images[0].fullsize : undefined;
+            const imageUrl = AppBskyEmbedImages.isView(embed)
+                ? embed.images[0].fullsize
+                : AppBskyEmbedRecordWithMedia.isView(embed) && AppBskyEmbedImages.isView(embed.media)
+                    ? embed.media.images[0].fullsize
+                    : undefined;
 
             return {
                 accountName: post.author.displayName,
