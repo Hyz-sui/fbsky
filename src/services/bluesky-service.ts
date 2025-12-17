@@ -1,47 +1,13 @@
 import { AtpAgent, AppBskyFeedDefs, AppBskyEmbedImages, AppBskyEmbedRecordWithMedia } from '@atproto/api';
 import { NotFoundError } from '@atproto/api/dist/client/types/app/bsky/feed/getPostThread';
+import { PostSummary } from './bsky-summary/post-summary';
+import { ProfileSummary } from './bsky-summary/profile-summary';
 
 const agent: AtpAgent = new AtpAgent({
     service: 'https://api.bsky.app/',
 });
 
 export type ApiErrorKind = 'RespondedWithFailure' | 'NotFound';
-
-export type PostSummary = {
-    accountName: string | undefined;
-    handle: string;
-    text: string | undefined;
-    authorDid: string;
-    rkey: string;
-    avatarUrl: string | undefined;
-    imageUrl: string | undefined;
-};
-export const isPostSummary = (value: any): value is PostSummary => {
-    return value && typeof value === 'object' &&
-        'accountName' in value &&
-        'handle' in value && typeof value.handle === 'string' &&
-        'text' in value &&
-        'authorDid' in value && typeof value.authorDid === 'string' &&
-        'rkey' in value && typeof value.rkey === 'string' &&
-        'avatarUrl' in value &&
-        'imageUrl' in value;
-}
-
-export type ProfileSummary = {
-    displayName: string | undefined;
-    did: string;
-    handle: string;
-    avatarUrl: string | undefined;
-    description: string | undefined;
-}
-export const isProfileSummary = (value: any): value is ProfileSummary => {
-    return value && typeof value === 'object' &&
-        'displayName' in value &&
-        'did' in value && typeof value.did === 'string' &&
-        'handle' in value && typeof value.handle === 'string' &&
-        'avatarUrl' in value &&
-        'description' in value;
-}
 
 export const blueskyService = {
     getPost: async (uri: string): Promise<PostSummary | ApiErrorKind> => {

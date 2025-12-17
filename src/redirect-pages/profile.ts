@@ -1,4 +1,4 @@
-import { ProfileSummary } from "../services/bluesky-service";
+import { ProfileSummary } from '../services/bsky-summary/profile-summary';
 import { ClientEnvironment } from "../client-environment";
 import { escapeHtml, escapeJavaScript } from "../utils/string-util";
 

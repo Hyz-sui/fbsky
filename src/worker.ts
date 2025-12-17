@@ -1,6 +1,10 @@
 import { ClientEnvironment } from "./client-environment";
 import { ResponseSummary } from "./response-summary";
-import { BlueskyService, isPostSummary, isProfileSummary, PostSummary, ProfileSummary } from "./services/bluesky-service";
+import { BlueskyService } from "./services/bluesky-service";
+import { isProfileSummary } from './services/bsky-summary/profile-summary';
+import { ProfileSummary } from './services/bsky-summary/profile-summary';
+import { isPostSummary } from './services/bsky-summary/post-summary';
+import { PostSummary } from './services/bsky-summary/post-summary';
 import { ErrorResponseService } from "./services/error-response-service";
 
 import jaIndexHtml from './static/ja/index.html';
