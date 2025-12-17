@@ -10,7 +10,8 @@
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
-    "start": "wrangler dev"
+    "start": "wrangler dev",
+    "types": "wrangler types"
   },
   "dependencies": {
     "@atproto/api": "^0.18.4",
