@@ -34,18 +34,22 @@ const respondWithTopPage = (clientEnvironment: ClientEnvironment): ResponseSumma
     };
 }
 
+const respondWith404 = (errorResponseService: ErrorResponseService, clientEnvironment: ClientEnvironment): ResponseSummary => {
+    const responseContentSummary = errorResponseService.get404Page(clientEnvironment);
+    return {
+        content: responseContentSummary.content,
+        mimeType: responseContentSummary.mimeType,
+        status: 404,
+    };
+}
+
 const respondWithError = (
     errorResponseService: ErrorResponseService,
     errorKind: FetchErrorKind,
     clientEnvironment: ClientEnvironment,
 ): ResponseSummary => {
     if (errorKind === 'InvalidUrl') {
-        const responseContentSummary = errorResponseService.get404Page(clientEnvironment);
-        return {
-            content: responseContentSummary.content,
-            mimeType: responseContentSummary.mimeType,
-            status: 404,
-        };
+        return respondWith404(errorResponseService, clientEnvironment);
     }
     if (errorKind === 'NotFound') {
         const responseContentSummary = errorResponseService.getPostNotFoundPage(clientEnvironment);
@@ -153,5 +157,5 @@ export const work = async (
         }
         return respondWithProfileSummary(profileSummary, clientEnvironment);
     }
-    return respondWithTopPage(clientEnvironment);
+    return respondWith404(errorResponseService, clientEnvironment);
 }
