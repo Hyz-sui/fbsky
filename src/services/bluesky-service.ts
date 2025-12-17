@@ -68,9 +68,9 @@ export const blueskyService = {
 
             const embed = post.embed;
             const imageUrl = AppBskyEmbedImages.isView(embed)
-                ? embed.images[0].fullsize
+                ? embed.images[0]?.fullsize
                 : AppBskyEmbedRecordWithMedia.isView(embed) && AppBskyEmbedImages.isView(embed.media)
-                    ? embed.media.images[0].fullsize
+                    ? embed.media.images[0]?.fullsize
                     : undefined;
 
             return {

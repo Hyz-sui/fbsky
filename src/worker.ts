@@ -138,8 +138,8 @@ export const work = async (
         return respondWithTopPage(clientEnvironment);
     }
     const postMatch = url.pathname.match(postUrlRegex);
-    if (postMatch) {
-        const { identifier, rkey } = postMatch.groups!;
+    if (postMatch && postMatch.groups && postMatch.groups.identifier && postMatch.groups.rkey) {
+        const { identifier, rkey } = postMatch.groups;
         const postSummary = await fetchPostSummary(blueskyService, { identifier, rkey });
         const isErroring = !isPostSummary(postSummary);
         if (isErroring) {
@@ -148,8 +148,8 @@ export const work = async (
         return respondWithPostSummary(postSummary, clientEnvironment);
     }
     const profileMatch = url.pathname.match(profileUrlRegex);
-    if (profileMatch) {
-        const { identifier } = profileMatch.groups!;
+    if (profileMatch && profileMatch.groups && profileMatch.groups.identifier) {
+        const { identifier } = profileMatch.groups;
         const profileSummary = await fetchProfileSummary(blueskyService, { identifier });
         const isErroring = !isProfileSummary(profileSummary);
         if (isErroring) {
