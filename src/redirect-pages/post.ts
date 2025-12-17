@@ -15,7 +15,10 @@ export const generatePostRedirectPage = (post: PostSummary, clientEnvironment: C
     const safeEncodedRkey = escapeHtml(dangerousEncodedRkey);
     const jsEncodedRkey = escapeJavaScript(dangerousEncodedRkey);
 
+    const safeEmbedImageUrl = post.imageUrl ? escapeHtml(post.imageUrl) : undefined;
     const safeAvatarUrl = post.avatarUrl ? escapeHtml(post.avatarUrl) : undefined;
+
+    const safeImageUrl = safeEmbedImageUrl || safeAvatarUrl;
 
     const dangerousWellFormedText = post.text ? post.text.replace(/\n+/g, ' ') : undefined;
     const safeWellFormedText = dangerousWellFormedText ? escapeHtml(dangerousWellFormedText) : undefined;
@@ -51,7 +54,8 @@ setTimeout(() => {
         }">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://bsky.app/profile/${safeEncodedAuthorDid}/post/${safeEncodedRkey}">
-    ${safeAvatarUrl ? `<meta property="og:image" content="${safeAvatarUrl}">` : ''}
+    ${safeImageUrl ? `<meta property="og:image" content="${safeImageUrl}">` : ''}
+    ${safeEmbedImageUrl ? `<meta property="twitter:card" content="summary_large_image">` : ''}
 </head>
 <body>
     <h1>${clientEnvironment.language === 'ja'

@@ -1,4 +1,4 @@
-import { AtpAgent, AppBskyFeedDefs, AppBskyFeedPost } from '@atproto/api';
+import { AtpAgent, AppBskyFeedDefs, AppBskyEmbedImages } from '@atproto/api';
 import { NotFoundError } from '@atproto/api/dist/client/types/app/bsky/feed/getPostThread';
 
 const agent: AtpAgent = new AtpAgent({
@@ -14,6 +14,7 @@ export type PostSummary = {
     authorDid: string;
     rkey: string;
     avatarUrl: string | undefined;
+    imageUrl: string | undefined;
 };
 export const isPostSummary = (value: any): value is PostSummary => {
     return value && typeof value === 'object' &&
@@ -22,7 +23,8 @@ export const isPostSummary = (value: any): value is PostSummary => {
         'text' in value &&
         'authorDid' in value && typeof value.authorDid === 'string' &&
         'rkey' in value && typeof value.rkey === 'string' &&
-        'avatarUrl' in value;
+        'avatarUrl' in value &&
+        'imageUrl' in value;
 }
 
 export type ProfileSummary = {
@@ -64,6 +66,9 @@ export const blueskyService = {
             const record = post.record;
             const text = typeof record.text === 'string' ? record.text : undefined;
 
+            const embed = post.embed;
+            const imageUrl = AppBskyEmbedImages.isView(embed) ? embed.images[0].fullsize : undefined;
+
             return {
                 accountName: post.author.displayName,
                 handle: post.author.handle,
@@ -71,6 +76,7 @@ export const blueskyService = {
                 authorDid: post.author.did,
                 rkey: post.uri.split('/').pop()!,
                 avatarUrl: post.author.avatar,
+                imageUrl,
             };
         } catch (error) {
             if (error instanceof NotFoundError) {
