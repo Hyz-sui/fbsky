@@ -1,6 +1,6 @@
 {
   "name": "fbsky",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "devDependencies": {
     "@types/node": "^24.10.2",
     "typescript": "^5.4.5",
