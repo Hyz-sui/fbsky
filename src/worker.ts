@@ -11,6 +11,8 @@ import jaIndexHtml from './static/ja/index.html';
 import enIndexHtml from './static/en/index.html';
 import { generatePostRedirectPage } from "./redirect-pages/post";
 import { generateProfileRedirectPage } from "./redirect-pages/profile";
+import { FeedGeneratorSummary, isFeedGeneratorSummary } from "./services/bsky-summary/feed-generator-summary";
+import { generateFeedGeneratorRedirectPage } from "./redirect-pages/feed-generator";
 
 type FetchErrorKind = 'InvalidUrl' | 'NotFound' | 'ApiFailure';
 
@@ -25,6 +27,14 @@ const respondWithPostSummary = (postSummary: PostSummary, clientEnvironment: Cli
 const respondWithProfileSummary = (profileSummary: ProfileSummary, clientEnvironment: ClientEnvironment): ResponseSummary => {
     return {
         content: generateProfileRedirectPage(profileSummary, clientEnvironment),
+        mimeType: 'text/html',
+        status: 200,
+    };
+}
+
+const respondWithFeedGeneratorSummary = (feedGeneratorSummary: FeedGeneratorSummary, clientEnvironment: ClientEnvironment): ResponseSummary => {
+    return {
+        content: generateFeedGeneratorRedirectPage(feedGeneratorSummary, clientEnvironment),
         mimeType: 'text/html',
         status: 200,
     };
@@ -80,19 +90,7 @@ const respondWithError = (
 
 const postUrlRegex = /^\/profile\/(?<identifier>[^/]+)\/post\/(?<rkey>[^/]+)$/;
 const profileUrlRegex = /^\/profile\/(?<identifier>[^/]+)$/;
-
-// https://bsky.app/profile/hyzsui.com/post/3m7ieabkso22k
-// https://fbsky.domain.example/profile/hyzsui.com/post/3m7ieabkso22k
-const extractPostUri = (requestUrl: URL) => {
-    const path = requestUrl.pathname;
-
-    const postMatch = path.match(postUrlRegex);
-    if (postMatch) {
-        const { identifier, rkey } = postMatch.groups!;
-        return `at://${identifier}/app.bsky.feed.post/${rkey}`;
-    }
-    return undefined;
-}
+const feedGeneratorUrlRegex = /^\/profile\/(?<identifier>[^/]+)\/feed\/(?<cid>[^/]+)$/;
 
 const fetchPostSummary = async (
     blueskyService: BlueskyService,
@@ -131,6 +129,24 @@ const fetchProfileSummary = async (
     }
 }
 
+const fetchFeedGeneratorSummary = async (
+    blueskyService: BlueskyService,
+    query: { identifier: string, cid: string },
+): Promise<FetchErrorKind | FeedGeneratorSummary> => {
+    try {
+        const feedGeneratorSummary = await blueskyService.getFeedGenerator(`at://${query.identifier}/app.bsky.feed.generator/${query.cid}`);
+        if (feedGeneratorSummary === 'NotFound') {
+            return 'NotFound';
+        }
+        if (feedGeneratorSummary === 'RespondedWithFailure') {
+            return 'ApiFailure';
+        }
+        return feedGeneratorSummary;
+    } catch (error) {
+        return 'ApiFailure';
+    }
+}
+
 export const work = async (
     blueskyService: BlueskyService,
     errorResponseService: ErrorResponseService,
@@ -141,6 +157,7 @@ export const work = async (
     if (url.pathname === '/') {
         return respondWithTopPage(clientEnvironment);
     }
+
     const postMatch = url.pathname.match(postUrlRegex);
     if (postMatch && postMatch.groups && postMatch.groups.identifier && postMatch.groups.rkey) {
         const { identifier, rkey } = postMatch.groups;
@@ -151,6 +168,7 @@ export const work = async (
         }
         return respondWithPostSummary(postSummary, clientEnvironment);
     }
+
     const profileMatch = url.pathname.match(profileUrlRegex);
     if (profileMatch && profileMatch.groups && profileMatch.groups.identifier) {
         const { identifier } = profileMatch.groups;
@@ -161,5 +179,17 @@ export const work = async (
         }
         return respondWithProfileSummary(profileSummary, clientEnvironment);
     }
+
+    const feedGeneratorMatch = url.pathname.match(feedGeneratorUrlRegex);
+    if (feedGeneratorMatch && feedGeneratorMatch.groups && feedGeneratorMatch.groups.identifier && feedGeneratorMatch.groups.cid) {
+        const { identifier, cid } = feedGeneratorMatch.groups;
+        const feedGeneratorSummary = await fetchFeedGeneratorSummary(blueskyService, { identifier, cid });
+        const isErroring = !isFeedGeneratorSummary(feedGeneratorSummary);
+        if (isErroring) {
+            return respondWithError(errorResponseService, feedGeneratorSummary, clientEnvironment);
+        }
+        return respondWithFeedGeneratorSummary(feedGeneratorSummary, clientEnvironment);
+    }
+
     return respondWith404(errorResponseService, clientEnvironment);
 }

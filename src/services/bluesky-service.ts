@@ -2,6 +2,7 @@ import { AtpAgent, AppBskyFeedDefs, AppBskyEmbedImages, AppBskyEmbedRecordWithMe
 import { NotFoundError } from '@atproto/api/dist/client/types/app/bsky/feed/getPostThread';
 import { PostSummary } from './bsky-summary/post-summary';
 import { ProfileSummary } from './bsky-summary/profile-summary';
+import { FeedGeneratorSummary } from './bsky-summary/feed-generator-summary';
 
 const agent: AtpAgent = new AtpAgent({
     service: 'https://api.bsky.app/',
@@ -56,6 +57,7 @@ export const blueskyService = {
             return 'RespondedWithFailure'
         }
     },
+
     getProfile: async (identifier: string): Promise<ProfileSummary | ApiErrorKind> => {
         try {
             const response = await agent.getProfile({
@@ -85,6 +87,45 @@ export const blueskyService = {
             return 'RespondedWithFailure'
         }
     },
+
+    getFeedGenerator: async (uri: string): Promise<FeedGeneratorSummary | ApiErrorKind> => {
+        try {
+            const response = await agent.app.bsky.feed.getFeedGenerator({
+                feed: uri,
+            });
+
+            if (!response.success) {
+                return 'RespondedWithFailure'
+            }
+
+            const feedGeneratorView = response.data.view;
+            const feedGenDisplayName = feedGeneratorView.displayName;
+            const feedGenDid = feedGeneratorView.did;
+            const feedGenRkey = feedGeneratorView.uri.split('/').pop()!;
+            const image = feedGeneratorView.avatar;
+            const description = feedGeneratorView.description;
+            const creator = feedGeneratorView.creator;
+            const creatorDisplayName = creator.displayName;
+            const creatorDid = creator.did;
+            const creatorHandle = creator.handle;
+
+            return {
+                displayName: feedGenDisplayName,
+                did: feedGenDid,
+                description,
+                rkey: feedGenRkey,
+                avatarUrl: image,
+                creator: {
+                    displayName: creatorDisplayName,
+                    did: creatorDid,
+                    handle: creatorHandle,
+                }
+            };
+        } catch (error) {
+            console.error('Error fetching feed generator:', error);
+            return 'RespondedWithFailure'
+        }
+    }
 }
 
 export type BlueskyService = typeof blueskyService;
