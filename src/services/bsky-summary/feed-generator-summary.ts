@@ -18,7 +18,7 @@ export const isFeedGeneratorSummary = (value: any): value is FeedGeneratorSummar
         'rkey' in value && typeof value.rkey === 'string' &&
         'avatarUrl' in value &&
         'description' in value &&
-        'creator' in value && typeof value.creator === 'object' &&
+        'creator' in value && typeof value.creator === 'object' && value.creator &&
         'displayName' in value.creator &&
         'did' in value.creator && typeof value.creator.did === 'string' &&
         'handle' in value.creator && typeof value.creator.handle === 'string';
