@@ -5,6 +5,8 @@ import { encodeUriComponentDid, escapeHtml, escapeJavaScript } from "../utils/st
 export const generateFeedGeneratorRedirectPage = (feedGeneratorSummary: FeedGeneratorSummary, clientEnvironment: ClientEnvironment): string => {
     const safeFeedGenDisplayName = escapeHtml(feedGeneratorSummary.displayName);
 
+    const safeCreatorHandle = escapeHtml(feedGeneratorSummary.creator.handle);
+
     const dangerousEncodedCreatorDid = encodeUriComponentDid(feedGeneratorSummary.creator.did);
     const safeEncodedCreatorDid = escapeHtml(dangerousEncodedCreatorDid);
     const jsEncodedCreatorDid = escapeJavaScript(dangerousEncodedCreatorDid);
@@ -23,8 +25,8 @@ export const generateFeedGeneratorRedirectPage = (feedGeneratorSummary: FeedGene
         ? 'Blueskyの「'
         : 'Bluesky feed &quot;'
         }${safeFeedGenDisplayName}${clientEnvironment.language === 'ja'
-            ? `」フィード | ${safeFeedGenCreatorDisplayName} さんによるカスタムフィード`
-            : `&quot; | Custom feed by ${safeFeedGenCreatorDisplayName}`
+            ? `」フィード | ${safeFeedGenCreatorDisplayName || safeCreatorHandle} さんによるカスタムフィード`
+            : `&quot; | Custom feed by ${safeFeedGenCreatorDisplayName || safeCreatorHandle}`
         }`;
 
     const jsRedirectScript = `
