@@ -41,10 +41,10 @@ setTimeout(() => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${safeTitle}</title>
     <meta property="og:title" content="${safeTitle}">
-    <meta property="og:description" content="${safeFeedGenDescription}">
+    ${safeFeedGenDescription ? `<meta property="og:description" content="${safeFeedGenDescription}">` : ''}
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://bsky.app/profile/${safeEncodedCreatorDid}/feed/${safeEncodedFeedGenRkey}">
-    <meta property="og:image" content="${safeFeedGenAvatarUrl}">
+    ${safeFeedGenAvatarUrl ? `<meta property="og:image" content="${safeFeedGenAvatarUrl}">` : ''}
 </head>
 <body>
     <h1>${clientEnvironment.language === 'ja'
