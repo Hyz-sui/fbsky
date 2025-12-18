@@ -21,10 +21,10 @@ export const generateFeedGeneratorRedirectPage = (feedGeneratorSummary: FeedGene
 
     const safeTitle = `${clientEnvironment.language === 'ja'
         ? 'Blueskyの「'
-        : 'Bluesky feed "'
+        : 'Bluesky feed &quot;'
         }${safeFeedGenDisplayName}${clientEnvironment.language === 'ja'
             ? `」フィード | ${safeFeedGenCreatorDisplayName} さんによるカスタムフィード`
-            : `" | Custom feed by ${safeFeedGenCreatorDisplayName}`
+            : `&quot; | Custom feed by ${safeFeedGenCreatorDisplayName}`
         }`;
 
     const jsRedirectScript = `
