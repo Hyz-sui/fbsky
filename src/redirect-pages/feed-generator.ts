@@ -5,12 +5,12 @@ import { encodeUriComponentDid, escapeHtml, escapeJavaScript } from "../utils/st
 export const generateFeedGeneratorRedirectPage = (feedGeneratorSummary: FeedGeneratorSummary, clientEnvironment: ClientEnvironment): string => {
     const safeFeedGenDisplayName = escapeHtml(feedGeneratorSummary.displayName);
 
-    const safeCreatorDid = escapeHtml(feedGeneratorSummary.creator.did);
     const dangerousEncodedCreatorDid = encodeUriComponentDid(feedGeneratorSummary.creator.did);
+    const safeEncodedCreatorDid = escapeHtml(dangerousEncodedCreatorDid);
     const jsEncodedCreatorDid = escapeJavaScript(dangerousEncodedCreatorDid);
 
-    const safeFeedGenRkey = escapeHtml(feedGeneratorSummary.rkey);
     const dangerousEncodedFeedGenRkey = encodeURIComponent(feedGeneratorSummary.rkey);
+    const safeEncodedFeedGenRkey = escapeHtml(dangerousEncodedFeedGenRkey);
     const jsEncodedFeedGenRkey = escapeJavaScript(dangerousEncodedFeedGenRkey);
 
     const safeFeedGenAvatarUrl = feedGeneratorSummary.avatarUrl ? escapeHtml(feedGeneratorSummary.avatarUrl) : undefined;
@@ -43,7 +43,7 @@ setTimeout(() => {
     <meta property="og:title" content="${safeTitle}">
     <meta property="og:description" content="${safeFeedGenDescription}">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://bsky.app/profile/${safeCreatorDid}/feed/${safeFeedGenRkey}">
+    <meta property="og:url" content="https://bsky.app/profile/${safeEncodedCreatorDid}/feed/${safeEncodedFeedGenRkey}">
     <meta property="og:image" content="${safeFeedGenAvatarUrl}">
 </head>
 <body>
@@ -56,8 +56,8 @@ setTimeout(() => {
             : 'Please wait a moment...'
         }</p>
     <p>${clientEnvironment.language === 'ja'
-            ? `自動で移動しない場合: <a href="https://bsky.app/profile/${safeCreatorDid}/feed/${safeFeedGenRkey}">手動で移動する</a>`
-            : `If you are not redirected automatically: <a href="https://bsky.app/profile/${safeCreatorDid}/feed/${safeFeedGenRkey}">JUMP TO BLUESKY MANUALLY</a>`
+            ? `自動で移動しない場合: <a href="https://bsky.app/profile/${safeEncodedCreatorDid}/feed/${safeEncodedFeedGenRkey}">手動で移動する</a>`
+            : `If you are not redirected automatically: <a href="https://bsky.app/profile/${safeEncodedCreatorDid}/feed/${safeEncodedFeedGenRkey}">JUMP TO BLUESKY MANUALLY</a>`
         }</p>
     <script>
         ${jsRedirectScript}
