@@ -1,47 +1,14 @@
 import { AtpAgent, AppBskyFeedDefs, AppBskyEmbedImages, AppBskyEmbedRecordWithMedia } from '@atproto/api';
 import { NotFoundError } from '@atproto/api/dist/client/types/app/bsky/feed/getPostThread';
+import { PostSummary } from './bsky-summary/post-summary';
+import { ProfileSummary } from './bsky-summary/profile-summary';
+import { FeedGeneratorSummary } from './bsky-summary/feed-generator-summary';
 
 const agent: AtpAgent = new AtpAgent({
     service: 'https://api.bsky.app/',
 });
 
 export type ApiErrorKind = 'RespondedWithFailure' | 'NotFound';
-
-export type PostSummary = {
-    accountName: string | undefined;
-    handle: string;
-    text: string | undefined;
-    authorDid: string;
-    rkey: string;
-    avatarUrl: string | undefined;
-    imageUrl: string | undefined;
-};
-export const isPostSummary = (value: any): value is PostSummary => {
-    return value && typeof value === 'object' &&
-        'accountName' in value &&
-        'handle' in value && typeof value.handle === 'string' &&
-        'text' in value &&
-        'authorDid' in value && typeof value.authorDid === 'string' &&
-        'rkey' in value && typeof value.rkey === 'string' &&
-        'avatarUrl' in value &&
-        'imageUrl' in value;
-}
-
-export type ProfileSummary = {
-    displayName: string | undefined;
-    did: string;
-    handle: string;
-    avatarUrl: string | undefined;
-    description: string | undefined;
-}
-export const isProfileSummary = (value: any): value is ProfileSummary => {
-    return value && typeof value === 'object' &&
-        'displayName' in value &&
-        'did' in value && typeof value.did === 'string' &&
-        'handle' in value && typeof value.handle === 'string' &&
-        'avatarUrl' in value &&
-        'description' in value;
-}
 
 export const blueskyService = {
     getPost: async (uri: string): Promise<PostSummary | ApiErrorKind> => {
@@ -90,6 +57,7 @@ export const blueskyService = {
             return 'RespondedWithFailure'
         }
     },
+
     getProfile: async (identifier: string): Promise<ProfileSummary | ApiErrorKind> => {
         try {
             const response = await agent.getProfile({
@@ -119,6 +87,45 @@ export const blueskyService = {
             return 'RespondedWithFailure'
         }
     },
+
+    getFeedGenerator: async (uri: string): Promise<FeedGeneratorSummary | ApiErrorKind> => {
+        try {
+            const response = await agent.app.bsky.feed.getFeedGenerator({
+                feed: uri,
+            });
+
+            if (!response.success) {
+                return 'RespondedWithFailure'
+            }
+
+            const feedGeneratorView = response.data.view;
+            const feedGenDisplayName = feedGeneratorView.displayName;
+            const feedGenDid = feedGeneratorView.did;
+            const feedGenRkey = feedGeneratorView.uri.split('/').pop()!;
+            const image = feedGeneratorView.avatar;
+            const description = feedGeneratorView.description;
+            const creator = feedGeneratorView.creator;
+            const creatorDisplayName = creator.displayName;
+            const creatorDid = creator.did;
+            const creatorHandle = creator.handle;
+
+            return {
+                displayName: feedGenDisplayName,
+                did: feedGenDid,
+                description,
+                rkey: feedGenRkey,
+                avatarUrl: image,
+                creator: {
+                    displayName: creatorDisplayName,
+                    did: creatorDid,
+                    handle: creatorHandle,
+                }
+            };
+        } catch (error) {
+            console.error('Error fetching feed generator:', error);
+            return 'RespondedWithFailure'
+        }
+    }
 }
 
 export type BlueskyService = typeof blueskyService;

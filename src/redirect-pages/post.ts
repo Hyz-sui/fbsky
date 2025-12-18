@@ -1,5 +1,5 @@
 import { ClientEnvironment } from "../client-environment";
-import { PostSummary } from "../services/bluesky-service";
+import { PostSummary } from '../services/bsky-summary/post-summary';
 import { escapeHtml, escapeJavaScript } from "../utils/string-util";
 
 export const generatePostRedirectPage = (post: PostSummary, clientEnvironment: ClientEnvironment): string => {
