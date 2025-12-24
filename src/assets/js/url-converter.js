@@ -1,5 +1,7 @@
 // @ts-check
 
+import { showSnackbar } from './snackbar.js';
+
 /**
  * 有効なBlueskyのURLかどうかを判定する
  * @param {URL} url 
@@ -65,7 +67,12 @@ const copyFixedUrl = (fixedUrlElement) => {
     if (fixedUrl) {
         navigator.clipboard.writeText(fixedUrl);
     }
-    navigator.clipboard.writeText(fixedUrl);
+    const lang = document.documentElement.lang;
+    if (lang === 'ja') {
+        showSnackbar('URLをコピーしました');
+    } else {
+        showSnackbar('URL copied to clipboard');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
