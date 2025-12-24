@@ -60,18 +60,18 @@ const updateFixedUrl = (urlInput, fixedUrlArea, fixedUrlElement, copyFixedUrlBut
 }
 /**
  * @param {HTMLAnchorElement} fixedUrlElement 
- * @returns {void}
+ * @returns {Promise<void>}
  */
-const copyFixedUrl = (fixedUrlElement) => {
+const copyFixedUrl = async (fixedUrlElement) => {
     const fixedUrl = fixedUrlElement.textContent;
     if (fixedUrl) {
-        navigator.clipboard.writeText(fixedUrl);
-    }
-    const lang = document.documentElement.lang;
-    if (lang === 'ja') {
-        showSnackbar('URLをコピーしました');
-    } else {
-        showSnackbar('URL copied to clipboard');
+        await navigator.clipboard.writeText(fixedUrl);
+        const lang = document.documentElement.lang;
+        if (lang === 'ja') {
+            showSnackbar('URLをコピーしました');
+        } else {
+            showSnackbar('URL copied to clipboard');
+        }
     }
 }
 
@@ -83,8 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
     urlInput.addEventListener('input', () => {
         updateFixedUrl(urlInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
     });
-    copyFixedUrlButton.addEventListener('click', () => {
-        copyFixedUrl(fixedUrlElement);
+    copyFixedUrlButton.addEventListener('click', async () => {
+        await copyFixedUrl(fixedUrlElement);
     });
     updateFixedUrl(urlInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
 });
