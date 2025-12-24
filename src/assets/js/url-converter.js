@@ -65,13 +65,18 @@ const updateFixedUrl = (urlInput, fixedUrlArea, fixedUrlElement, copyFixedUrlBut
 const copyFixedUrl = async (fixedUrlElement) => {
     const fixedUrl = fixedUrlElement.textContent;
     if (fixedUrl) {
-        await navigator.clipboard.writeText(fixedUrl);
         const lang = document.documentElement.lang;
-        if (lang === 'ja') {
-            showSnackbar('URLをコピーしました');
-        } else {
-            showSnackbar('URL copied to clipboard');
+        const isJapanese = lang === 'ja';
+        try {
+            await navigator.clipboard.writeText(fixedUrl);
+        } catch (error) {
+            showSnackbar(isJapanese ? 'URLをコピーできませんでした' : 'Failed to copy URL', {
+                duration: 8000,
+                allowClose: true
+            });
+            return;
         }
+        showSnackbar(isJapanese ? 'URLをコピーしました' : 'URL copied to clipboard');
     }
 }
 
