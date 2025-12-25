@@ -1,5 +1,7 @@
 // @ts-check
 
+import { showSnackbar } from './snackbar.js';
+
 /**
  * 有効なBlueskyのURLかどうかを判定する
  * @param {URL} url 
@@ -58,14 +60,24 @@ const updateFixedUrl = (urlInput, fixedUrlArea, fixedUrlElement, copyFixedUrlBut
 }
 /**
  * @param {HTMLAnchorElement} fixedUrlElement 
- * @returns {void}
+ * @returns {Promise<void>}
  */
-const copyFixedUrl = (fixedUrlElement) => {
+const copyFixedUrl = async (fixedUrlElement) => {
     const fixedUrl = fixedUrlElement.textContent;
     if (fixedUrl) {
-        navigator.clipboard.writeText(fixedUrl);
+        const lang = document.documentElement.lang;
+        const isJapanese = lang === 'ja';
+        try {
+            await navigator.clipboard.writeText(fixedUrl);
+        } catch (error) {
+            showSnackbar(isJapanese ? 'URLをコピーできませんでした' : 'Failed to copy URL', {
+                duration: 8000,
+                allowClose: true
+            });
+            return;
+        }
+        showSnackbar(isJapanese ? 'URLをコピーしました' : 'URL copied to clipboard');
     }
-    navigator.clipboard.writeText(fixedUrl);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -76,8 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
     urlInput.addEventListener('input', () => {
         updateFixedUrl(urlInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
     });
-    copyFixedUrlButton.addEventListener('click', () => {
-        copyFixedUrl(fixedUrlElement);
+    copyFixedUrlButton.addEventListener('click', async () => {
+        await copyFixedUrl(fixedUrlElement);
     });
     updateFixedUrl(urlInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
 });

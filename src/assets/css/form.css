@@ -1,8 +1,21 @@
+main {
+    margin: 0 auto;
+    width: fit-content;
+}
+
+.reverse-container {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
 .form-card {
     display: flex;
     flex-direction: column;
     word-break: break-all;
     width: 32rem;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+    box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
@@ -20,4 +33,25 @@
 .fixed-url-area {
     display: flex;
     flex-direction: column;
+}
+
+.converter-section {
+    gap: 0;
+}
+
+.converter-section .converter-description {
+    margin: 1rem;
+    margin-top: 0;
+    box-sizing: border-box;
+    width: 32rem;
+    border-radius: 0 0 8px 8px;
+    border-top-width: 0;
+    white-space: pre-line;
+}
+
+@media (max-width: 768px) {
+    .converter-section .converter-description {
+        width: auto;
+        align-self: stretch;
+    }
 }
