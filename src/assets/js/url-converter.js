@@ -133,11 +133,15 @@ const loadLanguageEnforcement = () => {
     if (!current) {
         return null;
     }
-    const enforcement = JSON.parse(current);
-    if (!isLanguageEnforcement(enforcement)) {
+    try {
+        const enforcement = JSON.parse(current);
+        if (!isLanguageEnforcement(enforcement)) {
+            return null;
+        }
+        return enforcement;
+    } catch {
         return null;
     }
-    return enforcement;
 }
 /**
  * @param {string} language 
