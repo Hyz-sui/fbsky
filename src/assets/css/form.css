@@ -55,3 +55,31 @@ main {
         align-self: stretch;
     }
 }
+
+.card:has(> .label-stretch-card) {
+    position: relative;
+    transition: background-color 0.2s ease-in-out;
+
+    &:hover {
+        background-color: var(--bg-variant-lighter-color);
+    }
+}
+
+.label-stretch-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+input#lang:not([data-loaded="true"]) {
+    visibility: hidden;
+}
+
+.note {
+    color: var(--main-variant-color);
+    font-size: 0.8rem;
+    margin: 0.5rem 0 0 0;
+}

@@ -12,6 +12,7 @@
     --primary-color: #4a619f;
     --on-primary-color: #ffffff;
     --primary-outline-color: #7e91ac;
+    --primary-bg-color: #d4dfff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,6 +28,7 @@
         --primary-color: #afbdff;
         --on-primary-color: #212121;
         --primary-outline-color: rgb(56, 72, 173);
+        --primary-bg-color: #284186;
     }
 }
 
@@ -104,6 +106,14 @@ a.card {
 a.card:hover {
     border-bottom-color: initial;
     color: unset;
+}
+
+.card.block {
+    display: block;
+}
+
+.card.no-padding {
+    padding: 0;
 }
 
 .card.elevated {
@@ -269,4 +279,52 @@ input[type='url']:focus:focus-visible,
 textarea:focus:focus-visible,
 select:focus:focus-visible {
     outline: none;
+}
+
+input[type='checkbox'].toggle {
+    appearance: none;
+    background-color: var(--main-variant-color);
+    width: 3rem;
+    height: 1.5rem;
+    vertical-align: middle;
+    position: relative;
+    border-radius: 0.75rem;
+    transition: background-color 0.1s ease;
+}
+
+input[type='checkbox'].toggle:checked {
+    background-color: var(--primary-color);
+}
+
+input[type='checkbox'].toggle::after {
+    content: '';
+    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-424 364-308q-11 11-28 11t-28-11q-11-11-11-28t11-28l116-116-116-115q-11-11-11-28t11-28q11-11 28-11t28 11l116 116 115-116q11-11 28-11t28 11q12 12 12 28.5T651-595L535-480l116 116q11 11 11 28t-11 28q-12 12-28.5 12T595-308L480-424Z" /></svg>'),
+        radial-gradient(circle closest-side, transparent calc(100% - 2px), #0f0 calc(100% - 2px));
+    mask-size: cover;
+    mask-position: center;
+    mask-composite: exclude;
+    background-color: var(--primary-bg-color);
+    box-sizing: border-box;
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0.125rem;
+    position: absolute;
+    left: 0;
+    border-radius: 0.75rem;
+    transform: rotate(0deg);
+    transition: left 0.1s ease-in,
+        transform 0.1s ease-in;
+}
+
+input[type='checkbox'].toggle:checked::after {
+    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="m382-354 339-339q12-12 28-12t28 12q12 12 12 28.5T777-636L410-268q-12 12-28 12t-28-12L182-440q-12-12-11.5-28.5T183-497q12-12 28.5-12t28.5 12l142 143Z" /></svg>'),
+        linear-gradient(#0f0 0 0);
+    left: 1.5rem;
+    transform: rotate(360deg);
+}
+
+label:has(input) {
+    cursor: pointer;
+    vertical-align: middle;
 }
