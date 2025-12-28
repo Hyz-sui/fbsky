@@ -9,12 +9,25 @@ import { ErrorResponseService } from "./services/error-response-service";
 
 import jaIndexHtml from './static/ja/index.html';
 import enIndexHtml from './static/en/index.html';
+import jaAboutHtml from './static/ja/about/index.html';
+import enAboutHtml from './static/en/about/index.html';
 import { generatePostRedirectPage } from "./redirect-pages/post";
 import { generateProfileRedirectPage } from "./redirect-pages/profile";
 import { FeedGeneratorSummary, isFeedGeneratorSummary } from "./services/bsky-summary/feed-generator-summary";
 import { generateFeedGeneratorRedirectPage } from "./redirect-pages/feed-generator";
 
 type FetchErrorKind = 'InvalidUrl' | 'NotFound' | 'ApiFailure';
+
+const respondWithRedirect = (to: string): ResponseSummary => {
+    return {
+        content: '',
+        mimeType: 'text/html',
+        status: 308,
+        headers: {
+            'Location': to,
+        },
+    };
+}
 
 const respondWithPostSummary = (postSummary: PostSummary, clientEnvironment: ClientEnvironment): ResponseSummary => {
     return {
@@ -43,6 +56,14 @@ const respondWithFeedGeneratorSummary = (feedGeneratorSummary: FeedGeneratorSumm
 const respondWithTopPage = (clientEnvironment: ClientEnvironment): ResponseSummary => {
     return {
         content: clientEnvironment.language === 'ja' ? jaIndexHtml : enIndexHtml,
+        mimeType: 'text/html',
+        status: 200,
+    };
+}
+
+const respondWithAboutPage = (clientEnvironment: ClientEnvironment): ResponseSummary => {
+    return {
+        content: clientEnvironment.language === 'ja' ? jaAboutHtml : enAboutHtml,
         mimeType: 'text/html',
         status: 200,
     };
@@ -154,8 +175,21 @@ export const work = async (
     clientEnvironment: ClientEnvironment,
 ) => {
     const url = new URL(requestUrl);
-    if (url.pathname === '/') {
+    const decodedPathname = decodeURIComponent(url.pathname);
+    if (decodedPathname === '/') {
         return respondWithTopPage(clientEnvironment);
+    }
+    if (/^\/about\/?$/.test(decodedPathname)) {
+        if (clientEnvironment.language === 'ja') {
+            return respondWithRedirect(encodeURI('/このサイトについて/'));
+        }
+        return respondWithAboutPage(clientEnvironment);
+    }
+    if (/^\/このサイトについて\/?$/.test(decodedPathname)) {
+        if (clientEnvironment.language === 'en') {
+            return respondWithRedirect('/about/');
+        }
+        return respondWithAboutPage(clientEnvironment);
     }
 
     const postMatch = url.pathname.match(postUrlRegex);
