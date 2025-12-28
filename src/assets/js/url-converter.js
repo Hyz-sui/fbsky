@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (langInput) {
         const storedEnforcement = loadLanguageEnforcement();
         if (storedEnforcement && langInput.dataset.language) {
-            langInput.checked = storedEnforcement[langInput.dataset.language];
+            langInput.checked = storedEnforcement[langInput.dataset.language] ?? true;
         }
         else {
             langInput.checked = true;
