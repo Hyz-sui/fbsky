@@ -181,7 +181,7 @@ export const work = async (
     }
     if (/^\/about\/?$/.test(decodedPathname)) {
         if (clientEnvironment.language === 'ja') {
-            return respondWithRedirect('/このサイトについて/');
+            return respondWithRedirect(encodeURI('/このサイトについて/'));
         }
         return respondWithAboutPage(clientEnvironment);
     }
