@@ -76,12 +76,49 @@ h6 {
     font-weight: normal;
 }
 
+h1 {
+    font-size: 2.5rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+}
+
+h2 {
+    font-size: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+}
+
+h3 {
+    font-size: 1.8rem;
+}
+
+h4 {
+    font-size: 1.6rem;
+}
+
+h5 {
+    font-size: 1.4rem;
+}
+
+h6 {
+    font-size: 1.2rem;
+}
+
 a {
     color: var(--link-color);
     text-decoration: none;
     border-bottom: 1px solid transparent;
     box-sizing: border-box;
     transition: border-bottom-color 0.3s ease, color 0.3s ease;
+}
+
+code {
+    font-family: monospace;
+    background-color: var(--bg-variant-color);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
 }
 
 a:hover {
@@ -112,8 +149,17 @@ a.card:hover {
     display: block;
 }
 
+.card.block.shrink {
+    width: fit-content;
+}
+
 .card.no-padding {
     padding: 0;
+}
+
+.card.no-side-margin {
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .card.elevated {
@@ -327,4 +373,34 @@ input[type='checkbox'].toggle:checked::after {
 label:has(input) {
     cursor: pointer;
     vertical-align: middle;
+}
+
+dl,
+dt,
+dd {
+    margin: 0;
+}
+
+dt {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+footer {
+    margin-top: 8rem;
+    border-top: var(--border-color) 2px solid;
+    padding-top: 1rem;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--main-variant-color);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
 }
