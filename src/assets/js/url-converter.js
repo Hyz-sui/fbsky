@@ -144,18 +144,10 @@ const loadLanguageEnforcement = () => {
  * @param {boolean} checked 
  */
 const storeLanguageEnforcement = (language, checked) => {
-    const browserEnforcement = loadLanguageEnforcement();
-    if (browserEnforcement) {
-        browserEnforcement[language] = checked;
-        localStorage.setItem(LANGUAGE_ENFORCEMENT_STORAGE_KEY, JSON.stringify(browserEnforcement));
-    }
-    else {
-        /** @type {LanguageEnforcement} */
-        const enforcement = {
-            [language]: checked
-        }
-        localStorage.setItem(LANGUAGE_ENFORCEMENT_STORAGE_KEY, JSON.stringify(enforcement));
-    }
+    /** @type {LanguageEnforcement} */
+    const browserEnforcement = loadLanguageEnforcement() ?? {};
+    browserEnforcement[language] = checked;
+    localStorage.setItem(LANGUAGE_ENFORCEMENT_STORAGE_KEY, JSON.stringify(browserEnforcement));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
