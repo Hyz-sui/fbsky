@@ -74,8 +74,11 @@ main {
     width: 100%;
 }
 
-input#lang:not([data-loaded="true"]) {
-    visibility: hidden;
+input#lang,
+input#showThumbnail {
+    &:not([data-loaded="true"]) {
+        visibility: hidden;
+    }
 }
 
 .note {

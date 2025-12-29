@@ -18,12 +18,15 @@ const isValidUrl = (url) => {
 /**
  * @param {URL} url 
  * @param {HTMLInputElement | null} languageInput 
+ * @param {HTMLInputElement | null} showThumbnailInput 
  */
-const wellFormInputs = (url, languageInput) => {
+const wellFormInputs = (url, languageInput, showThumbnailInput) => {
     const language = languageInput?.checked ? languageInput.dataset.language || null : null;
+    const showThumbnail = showThumbnailInput?.checked ?? false;
     return {
         url,
-        language
+        language,
+        showThumbnail
     }
 }
 
@@ -35,7 +38,7 @@ const wellFormInputs = (url, languageInput) => {
  * @param {WellFormedInput} wellFormedInput 
  * @returns {string}
  */
-const toFixedUrl = ({ url, language }) => {
+const toFixedUrl = ({ url, language, showThumbnail }) => {
     const path = url.pathname;
     const currentUrl = new URL(window.location.href);
     const currentProtocol = currentUrl.protocol;
@@ -45,6 +48,9 @@ const toFixedUrl = ({ url, language }) => {
     const searchParams = new URLSearchParams();
     if (language) {
         searchParams.set('lang', language);
+    }
+    if (!showThumbnail) {
+        searchParams.set('noThumb', '');
     }
 
     const fixedUrl = new URL('https://placeholder.example/');
@@ -59,11 +65,12 @@ const toFixedUrl = ({ url, language }) => {
 /**
  * @param {HTMLInputElement} urlInput 
  * @param {HTMLInputElement | null} languageInput
+ * @param {HTMLInputElement | null} showThumbnailInput
  * @param {HTMLDivElement} fixedUrlArea 
  * @param {HTMLAnchorElement} fixedUrlElement 
  * @param {HTMLButtonElement} copyFixedUrlButton 
  */
-const updateFixedUrl = (urlInput, languageInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton) => {
+const updateFixedUrl = (urlInput, languageInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton) => {
     const urlString = urlInput.value;
     try {
         const url = new URL(urlString);
@@ -74,7 +81,7 @@ const updateFixedUrl = (urlInput, languageInput, fixedUrlArea, fixedUrlElement, 
             copyFixedUrlButton.ariaDisabled = 'true';
             return;
         }
-        const fixedUrl = toFixedUrl(wellFormInputs(url, languageInput));
+        const fixedUrl = toFixedUrl(wellFormInputs(url, languageInput, showThumbnailInput));
         fixedUrlElement.textContent = fixedUrl;
         fixedUrlElement.href = fixedUrl;
         fixedUrlElement.style.visibility = 'visible';
@@ -154,14 +161,43 @@ const storeLanguageEnforcement = (language, checked) => {
     localStorage.setItem(LANGUAGE_ENFORCEMENT_STORAGE_KEY, JSON.stringify(browserEnforcement));
 }
 
+const THUMBNAIL_VISIBILITY_STORAGE_KEY = 'thumbnailVisibility';
+
+/**
+ * @returns {boolean | null}
+ */
+const loadThumbnailVisibility = () => {
+    const current = localStorage.getItem(THUMBNAIL_VISIBILITY_STORAGE_KEY);
+    if (!current) {
+        return null;
+    }
+    try {
+        const visibility = JSON.parse(current);
+        if (typeof visibility !== 'boolean') {
+            return null;
+        }
+        return visibility;
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * @param {boolean} visibility 
+ */
+const storeThumbnailVisibility = (visibility) => {
+    localStorage.setItem(THUMBNAIL_VISIBILITY_STORAGE_KEY, JSON.stringify(visibility));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const urlInput = /** @type {HTMLInputElement} */ (document.getElementById('url'));
     const fixedUrlArea = /** @type {HTMLDivElement} */ (document.getElementById('fixedUrlArea'));
     const fixedUrlElement = /** @type {HTMLAnchorElement} */ (document.getElementById('fixedUrl'));
     const copyFixedUrlButton = /** @type {HTMLButtonElement} */ (document.getElementById('copyFixedUrlButton'));
     const langInput = /** @type {HTMLInputElement | null} */ (document.getElementById('lang'));
+    const showThumbnailInput = /** @type {HTMLInputElement | null} */ (document.getElementById('showThumbnail'));
     urlInput.addEventListener('input', () => {
-        updateFixedUrl(urlInput, langInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
+        updateFixedUrl(urlInput, langInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
     });
 
     if (langInput) {
@@ -178,13 +214,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!lang) {
                 return;
             }
-            updateFixedUrl(urlInput, langInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
+            updateFixedUrl(urlInput, langInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
             storeLanguageEnforcement(lang, langInput.checked);
+        });
+    }
+    if (showThumbnailInput) {
+        const storedVisibility = loadThumbnailVisibility();
+        if (storedVisibility !== null) {
+            showThumbnailInput.checked = storedVisibility;
+        }
+        else {
+            showThumbnailInput.checked = false;
+        }
+        showThumbnailInput.dataset.loaded = 'true';
+        showThumbnailInput.addEventListener('change', () => {
+            updateFixedUrl(urlInput, langInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
+            storeThumbnailVisibility(showThumbnailInput.checked);
         });
     }
 
     copyFixedUrlButton.addEventListener('click', async () => {
         await copyFixedUrl(fixedUrlElement);
     });
-    updateFixedUrl(urlInput, langInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
+    updateFixedUrl(urlInput, langInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
 });

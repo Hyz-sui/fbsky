@@ -54,8 +54,8 @@ setTimeout(() => {
         }">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://bsky.app/profile/${safeEncodedAuthorDid}/post/${safeEncodedRkey}">
-    ${safeImageUrl ? `<meta property="og:image" content="${safeImageUrl}">` : ''}
-    ${safeEmbedImageUrl ? `<meta property="twitter:card" content="summary_large_image">` : ''}
+    ${clientEnvironment.showThumbnail && safeImageUrl ? `<meta property="og:image" content="${safeImageUrl}">` : ''}
+    ${clientEnvironment.showThumbnail && safeEmbedImageUrl ? `<meta property="twitter:card" content="summary_large_image">` : ''}
 </head>
 <body>
     <h1>${clientEnvironment.language === 'ja'
