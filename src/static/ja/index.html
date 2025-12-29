@@ -29,14 +29,24 @@
                         BlueskyのURL
                         <input type="url" name="url" id="url" class="input" />
                     </label>
-                    <div class="card outlined block">
+                    <div class="card part-top outlined block">
                         <label class="label-stretch-card">
-                            <input type="checkbox" name="lang" id="lang" data-language="ja" class="input toggle"
-                                aria-describedby="langNote" />
+                            <input type="checkbox" name="lang" id="lang" data-language="ja"
+                                class="input toggle deferred" aria-describedby="langNote" />
                             日本語表示を強制する
                         </label>
                         <p class="note" id="langNote">
                             日本語を強制しない場合、X等一部のサービスでは英語で埋め込みが表示されます。埋め込み内のテキストを日本語にしたい場合、オンに設定してください。
+                        </p>
+                    </div>
+                    <div class="card part-bottom outlined block">
+                        <label class="label-stretch-card">
+                            <input type="checkbox" name="show-thumbnail" id="showThumbnail"
+                                class="input toggle deferred" aria-describedby="showThumbnailNote" />
+                            サムネイルを表示する
+                        </label>
+                        <p class="note" id="showThumbnailNote">
+                            オンに設定すると、埋め込みにプロフィール画像や添付画像の1枚目などが表示されます。
                         </p>
                     </div>
                     <div id="fixedUrlArea" class="fixed-url-area" style="visibility: hidden;">

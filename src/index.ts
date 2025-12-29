@@ -27,8 +27,12 @@ export default {
         })();
         // 優先順位の判定はサボる
         const isJapanese = language?.includes('ja');
+
+        const showThumbnail = !requestUrl.searchParams.has('noThumb');
+
         const clientEnvironment: ClientEnvironment = {
             language: isJapanese ? 'ja' : 'en',
+            showThumbnail,
         };
 
         const responseContentSummary = await work(blueskyService, errorResponseService, request.url, clientEnvironment);

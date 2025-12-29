@@ -30,6 +30,16 @@
                         <input type="url" name="url" id="url" class="input" />
                     </label>
                     <!-- force language here if not English -->
+                    <div class="card outlined block">
+                        <label class="label-stretch-card">
+                            <input type="checkbox" name="show-thumbnail" id="showThumbnail"
+                                class="input toggle deferred" aria-describedby="showThumbnailNote" />
+                            Show thumbnail
+                        </label>
+                        <p class="note" id="showThumbnailNote">
+                            Shows profile images or the first attached image on preview cards.
+                        </p>
+                    </div>
                     <div id="fixedUrlArea" class="fixed-url-area" style="visibility: hidden;">
                         <span id="fixedUrlLabel" class="fixed-url-label">Embedding URL</span>
                         <div class="fixed-url-box card outlined" aria-labelledby="fixedUrlLabel">

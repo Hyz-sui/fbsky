@@ -74,7 +74,7 @@ main {
     width: 100%;
 }
 
-input#lang:not([data-loaded="true"]) {
+.deferred:not([data-loaded="true"]) {
     visibility: hidden;
 }
 
