@@ -43,6 +43,7 @@ setTimeout(() => {
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://bsky.app/profile/${safeDid}">
     ${safeAvatarUrl ? `<meta property="og:image" content="${safeAvatarUrl}">` : ''}
+    <meta name="robots" content="noindex, nofollow">
 </head>
 <body>
     <h1>${clientEnvironment.language === 'ja'
