@@ -1,5 +1,10 @@
 # fbsky
 
+[![LICENSE: MIT](https://img.shields.io/github/license/Hyz-sui/fbsky?style=for-the-badge&labelColor=222222&color=afbdff)](https://github.com/Hyz-sui/fbsky/blob/main/LICENSE)
+[![Bluesky: @hyzsui.com](https://img.shields.io/badge/Bluesky-%40hyzsui.com-afbdff?style=for-the-badge&logo=bluesky&labelColor=222222)
+](https://bsky.app/profile/hyzsui.com)
+
+
 https://fbsky.hyzsui.com/
 
 fbsky is a tool designed to display Bluesky links as rich link cards on various social media platforms.
