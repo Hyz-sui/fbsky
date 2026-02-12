@@ -127,7 +127,7 @@ const copyFixedUrl = async (fixedUrlElement) => {
 const openXIntent = (fixedUrlElement) => {
     const fixedUrl = fixedUrlElement.textContent;
     if (fixedUrl) {
-        const intentUrl = `https://x.com/intent/tweet?${new URLSearchParams({ url: fixedUrl }).toString()}`;
+        const intentUrl = `https://x.com/intent/tweet?${new URLSearchParams({ url: fixedUrl, text: '\n' }).toString()}`;
         window.open(intentUrl, '_blank', 'width=800,height=450,popup,noopener,noreferrer');
     }
 }
