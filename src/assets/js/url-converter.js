@@ -69,8 +69,9 @@ const toFixedUrl = ({ url, language, showThumbnail }) => {
  * @param {HTMLDivElement} fixedUrlArea 
  * @param {HTMLAnchorElement} fixedUrlElement 
  * @param {HTMLButtonElement} copyFixedUrlButton 
+ * @param {HTMLButtonElement} postXButton 
  */
-const updateFixedUrl = (urlInput, languageInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton) => {
+const updateFixedUrl = (urlInput, languageInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton, postXButton) => {
     const urlString = urlInput.value;
     try {
         const url = new URL(urlString);
@@ -79,6 +80,7 @@ const updateFixedUrl = (urlInput, languageInput, showThumbnailInput, fixedUrlAre
             fixedUrlElement.href = '';
             fixedUrlElement.style.visibility = 'hidden';
             copyFixedUrlButton.ariaDisabled = 'true';
+            postXButton.ariaDisabled = 'true';
             return;
         }
         const fixedUrl = toFixedUrl(wellFormInputs(url, languageInput, showThumbnailInput));
@@ -87,11 +89,13 @@ const updateFixedUrl = (urlInput, languageInput, showThumbnailInput, fixedUrlAre
         fixedUrlElement.style.visibility = 'visible';
         fixedUrlArea.style.visibility = 'visible';
         copyFixedUrlButton.ariaDisabled = 'false';
+        postXButton.ariaDisabled = 'false';
     } catch (error) {
         fixedUrlElement.textContent = '';
         fixedUrlElement.href = '';
         fixedUrlElement.style.visibility = 'hidden';
         copyFixedUrlButton.ariaDisabled = 'true';
+        postXButton.ariaDisabled = 'true';
         return;
     }
 }
@@ -114,6 +118,17 @@ const copyFixedUrl = async (fixedUrlElement) => {
             return;
         }
         showSnackbar(isJapanese ? 'URLをコピーしました' : 'URL copied to clipboard');
+    }
+}
+
+/**
+ * @param {HTMLAnchorElement} fixedUrlElement
+ */
+const openXIntent = (fixedUrlElement) => {
+    const fixedUrl = fixedUrlElement.textContent;
+    if (fixedUrl) {
+        const intentUrl = `https://x.com/intent/tweet?${new URLSearchParams({ url: fixedUrl }).toString()}`;
+        window.open(intentUrl, '_blank', 'width=800,height=450,popup,noopener,noreferrer');
     }
 }
 
@@ -194,10 +209,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const fixedUrlArea = /** @type {HTMLDivElement} */ (document.getElementById('fixedUrlArea'));
     const fixedUrlElement = /** @type {HTMLAnchorElement} */ (document.getElementById('fixedUrl'));
     const copyFixedUrlButton = /** @type {HTMLButtonElement} */ (document.getElementById('copyFixedUrlButton'));
+    const postXButton = /** @type {HTMLButtonElement} */ (document.getElementById('postXButton'));
     const langInput = /** @type {HTMLInputElement | null} */ (document.getElementById('lang'));
     const showThumbnailInput = /** @type {HTMLInputElement | null} */ (document.getElementById('showThumbnail'));
     urlInput.addEventListener('input', () => {
-        updateFixedUrl(urlInput, langInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
+        updateFixedUrl(urlInput, langInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton, postXButton);
     });
 
     if (langInput) {
@@ -214,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!lang) {
                 return;
             }
-            updateFixedUrl(urlInput, langInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
+            updateFixedUrl(urlInput, langInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton, postXButton);
             storeLanguageEnforcement(lang, langInput.checked);
         });
     }
@@ -228,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         showThumbnailInput.dataset.loaded = 'true';
         showThumbnailInput.addEventListener('change', () => {
-            updateFixedUrl(urlInput, langInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
+            updateFixedUrl(urlInput, langInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton, postXButton);
             storeThumbnailVisibility(showThumbnailInput.checked);
         });
     }
@@ -236,5 +252,8 @@ document.addEventListener('DOMContentLoaded', () => {
     copyFixedUrlButton.addEventListener('click', async () => {
         await copyFixedUrl(fixedUrlElement);
     });
-    updateFixedUrl(urlInput, langInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton);
+    postXButton.addEventListener('click', () => {
+        openXIntent(fixedUrlElement);
+    });
+    updateFixedUrl(urlInput, langInput, showThumbnailInput, fixedUrlArea, fixedUrlElement, copyFixedUrlButton, postXButton);
 });
